@@ -22,21 +22,29 @@ public class CAFReminderService
         _log = log;
     }
 
-    private IEnumerable<Rotate> TeamDailyRotates(string rotateTableName)
+    private IEnumerable<Rotate> GetAllRotates(string rotateTableName)
     {
-        var teamDailyRotates = _azureTableService.GetEntitysByPartitionKey<Rotate>(rotateTableName);
+        var teamDailyRotates = _azureTableService.GetEntitysByPartitionKey<Rotate>(rotateTableName)
+            .Where(rotate => rotate.Status != (int)OwnerStatus.Inactive);
+        
         if (teamDailyRotates == null || !teamDailyRotates.Any())
         {
             throw new RotateListNotExistException();
         }
 
-        teamDailyRotates = teamDailyRotates.OrderBy(rotate => rotate.Order);
         return teamDailyRotates;
     }
 
-    private async Task<Rotate> GetCurrentRotator(string rotateTableName)
+    private List<Rotate> GetAllRotatorsWithOrder(string rotateTableName)
     {
-        var teamDailyRotates = TeamDailyRotates(rotateTableName);
+        var teamDailyRotates = GetAllRotates(rotateTableName).OrderBy(rotate => rotate.Order);
+
+        return teamDailyRotates.ToList();
+    }
+
+    private Rotate GetCurrentRotator(string rotateTableName)
+    {
+        var teamDailyRotates = GetAllRotates(rotateTableName);
 
         var curRotate = teamDailyRotates
             .FirstOrDefault(rotate => rotate.Status == (int)OwnerStatus.Cur);
@@ -46,7 +54,8 @@ public class CAFReminderService
 
     private async Task<Rotate> GetNextRotator(string rotateTableName)
     {
-        var teamDailyRotates = TeamDailyRotates(rotateTableName);
+        var teamDailyRotates = GetAllRotates(rotateTableName)
+            .OrderBy(rotate => rotate.Order);
 
         var curRotate = teamDailyRotates.FirstOrDefault(rotate => rotate.Status == (int)OwnerStatus.Cur);
         if (curRotate != null)
@@ -127,8 +136,15 @@ public class CAFReminderService
             }
             else if (teamDailyMsgTemplateContent.Contains("<cur_username>"))
             {
-                var username = GetCurrentRotator(rotateTableName).Result;
+                var username = GetCurrentRotator(rotateTableName);
                 teamDailyMsgTemplateContent = teamDailyMsgTemplateContent.Replace("<cur_username>", username.Content);
+            }
+
+            if (teamDailyMsgTemplateContent.Contains("<all_username>"))
+            {
+                var allUsername = string.Join(", ",
+                    GetAllRotatorsWithOrder(rotateTableName).Select(rotate => rotate.RowKey));
+                teamDailyMsgTemplateContent = teamDailyMsgTemplateContent.Replace("<all_username>", allUsername);
             }
 
             var webhook = _azureTableService

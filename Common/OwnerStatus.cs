@@ -2,7 +2,7 @@
 
 public enum OwnerStatus
 {
-    None = 0,
+    Inactive = 0,
     Wait = 1,
     Cur = 2,
     Done = 3,
