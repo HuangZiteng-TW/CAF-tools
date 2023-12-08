@@ -32,7 +32,20 @@ namespace CAF.Core
             _localMemeCache = localMemeCache;
         }
 
-        // [FunctionName("CAF_Core")]
+        private bool CheckAPIKeyValid(string apikey)
+        {
+            var bytes = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(apikey));
+            var key = String.Empty;
+            foreach (byte b in bytes)
+            {
+                key += $"{b:X2}";
+            }
+
+            return !_azureTableService.GetEntitysByPartitionKey<ApiKey>(TablePartitionKey.ApiKeyName)
+                .All(apikey => String.Compare(apikey.Content, key, StringComparison.OrdinalIgnoreCase) != 0);
+        }
+
+        [FunctionName("reminder")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]
             HttpRequest req,
@@ -42,33 +55,28 @@ namespace CAF.Core
             {
                 if (!req.Query.ContainsKey("key"))
                 {
-                    return new BadRequestObjectResult("Invalid api key.");
+                    return new BadRequestObjectResult("API key not exist.");
                 }
 
-                var bytes = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(req.Query["key"].ToString()));
-                var key = String.Empty;
-                foreach (byte b in bytes)
-                {
-                    key += $"{b:X2}";
-                }
-
-                if (_azureTableService.GetEntitysByPartitionKey<ApiKey>(TablePartitionKey.ApiKeyName)
-                    .All(apikey => String.Compare(apikey.Content, key, StringComparison.OrdinalIgnoreCase) != 0))
+                if (CheckAPIKeyValid(req.Query["key"].ToString()) == false)
                 {
                     return new BadRequestObjectResult("Invalid api key.");
                 }
 
-                var reminderJobNames =
-                    _azureTableService.GetEntitysByPartitionKey<ReminderJobName>(TablePartitionKey.ReminderJobName);
-                foreach (var reminderJobName in reminderJobNames)
+                var reminderCache = _localMemeCache.GetCacheByReminderName(req.Query["remindername"].ToString());
+                if (!req.Query.ContainsKey("remindername") || reminderCache == null)
                 {
-                    var schedule = _azureTableService
-                        .GetEntityByRowKey<Schedule>(TablePartitionKey.Schedule, reminderJobName.RowKey);
+                    return new BadRequestObjectResult("Rotate name incorrect or not exist.");
                 }
 
-                var teamDailyCache = _localMemeCache.ReminderCaches
-                    .SingleOrDefault(cache => cache.ReminderJobName.RowKey == "TeamDaily");
-                await _cafReminderService.SendReminder(teamDailyCache);
+                if (req.Method.ToLower() == "get")
+                {
+                    await _cafReminderService.SendReminderWithoutUpdate(reminderCache);
+                }
+                else if (req.Method.ToLower() == "post")
+                {
+                    await _cafReminderService.UpdateRotateAndSendReminder(reminderCache);
+                }
             }
             catch (Exception e)
             {
@@ -76,41 +84,7 @@ namespace CAF.Core
                 throw;
             }
 
-
-            // Console.WriteLine("Start.");
-            // Pageable<TableEntity> queryResultsFilter =
-            //     _tableClient.Query<TableEntity>(filter: $"PartitionKey eq '{PartitionKey}'");
-            //
-            // foreach (TableEntity qEntity in queryResultsFilter)
-            // {
-            //     Console.WriteLine($"{qEntity.GetString("Content")}");
-            // }
-            //
-            // Console.WriteLine($"The query returned {queryResultsFilter.Count()} entities.");
-
-
-            // var request = new Msg("???");
-            // var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-            // var response =
-            //     await client.PostAsync(
-            //         "https://chat.googleapis.com/v1/spaces/AAAAB-3o-pE/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=iLE7EFJa66wV3e0MacJaLTNNSfxFPDrLKbpv4kG2b5k",
-            //         content);
-            //
-            // var responseString = await response.Content.ReadAsStringAsync();
-
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
-            string name = req.Query["name"];
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            return new OkObjectResult("Success.");
         }
     }
 }

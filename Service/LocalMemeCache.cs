@@ -69,6 +69,12 @@ public class LocalMemeCache
 
         _log.LogInformation("ReminderCaches count: " + ReminderCaches.Count);
     }
+
+    public ReminderCacheEntity GetCacheByReminderName(string reminderJobName)
+    {
+        var reminderCacheEntity = ReminderCaches.FirstOrDefault(cache=> cache.ReminderJobName.RowKey == reminderJobName);
+        return reminderCacheEntity;
+    }
 }
 
 public class ReminderCacheEntity

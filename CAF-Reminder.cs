@@ -39,7 +39,7 @@ namespace CAF.Reminder
                 Console.WriteLine(reminderCache.Schedule.ScheduleCron.ToString());
                 if (reminderCache.Schedule.ScheduleCron.Match(currentDatetime))
                 {
-                    await _cafReminderService.SendReminder(reminderCache);
+                    await _cafReminderService.UpdateRotateAndSendReminder(reminderCache);
                 }
             }
         }

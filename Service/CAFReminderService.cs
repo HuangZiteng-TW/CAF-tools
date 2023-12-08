@@ -26,12 +26,13 @@ public class CAFReminderService
     {
         var teamDailyRotates = _azureTableService.GetEntitysByPartitionKey<Rotate>(rotateTableName)
             .Where(rotate => rotate.Status != (int)OwnerStatus.Inactive);
-        
+
         if (teamDailyRotates == null || !teamDailyRotates.Any())
         {
             throw new RotateListNotExistException();
         }
 
+        teamDailyRotates = teamDailyRotates.OrderBy(rotate => rotate.Order);
         return teamDailyRotates;
     }
 
@@ -52,40 +53,36 @@ public class CAFReminderService
         return curRotate;
     }
 
-    private async Task<Rotate> GetNextRotator(string rotateTableName)
+    private Rotate GetNextRotator(string rotateTableName)
     {
-        var teamDailyRotates = GetAllRotates(rotateTableName)
-            .OrderBy(rotate => rotate.Order);
+        var allRotatorsWithOrder = GetAllRotatorsWithOrder(rotateTableName);
 
-        var curRotate = teamDailyRotates.FirstOrDefault(rotate => rotate.Status == (int)OwnerStatus.Cur);
+        var curRotate = allRotatorsWithOrder.FirstOrDefault(rotate => rotate.OwnerStatus == OwnerStatus.Cur);
         if (curRotate != null)
         {
-            curRotate.Status = (int)OwnerStatus.Done;
-            await _azureTableService.UpdateEntityByRowKey(curRotate);
+            curRotate.OwnerStatus = OwnerStatus.Done;
+            _azureTableService.UpdateEntityByRowKey(curRotate);
         }
 
-        if (teamDailyRotates.All(rotate => rotate.Status == (int)OwnerStatus.Done))
+        if (allRotatorsWithOrder.All(rotate =>
+                rotate.OwnerStatus == OwnerStatus.Done || rotate.OwnerStatus >= OwnerStatus.Skip))
         {
-            foreach (var rotate in teamDailyRotates)
+            foreach (var rotate in allRotatorsWithOrder)
             {
-                rotate.Status = (int)OwnerStatus.Wait;
-                await _azureTableService.UpdateEntityByRowKey(rotate);
+                rotate.OwnerStatus = OwnerStatus.Wait;
+                _azureTableService.UpdateEntityByRowKey(rotate);
             }
         }
 
-        var firstRotate = teamDailyRotates.FirstOrDefault(rotate => rotate.Status == (int)OwnerStatus.Skip);
-        if (firstRotate == null)
-        {
-            firstRotate = teamDailyRotates.FirstOrDefault(rotate => rotate.Status == (int)OwnerStatus.Wait);
-        }
+        var firstRotate = allRotatorsWithOrder.FirstOrDefault(rotate => rotate.OwnerStatus == OwnerStatus.Wait);
 
         if (firstRotate == null)
         {
             throw new RotateNotExistException();
         }
 
-        firstRotate.Status = (int)OwnerStatus.Cur;
-        await _azureTableService.UpdateEntityByRowKey(firstRotate);
+        firstRotate.OwnerStatus = OwnerStatus.Cur;
+        _azureTableService.UpdateEntityByRowKey(firstRotate);
 
         return firstRotate;
     }
@@ -105,7 +102,7 @@ public class CAFReminderService
             if (skipAndNext)
             {
                 curRotate.Status = (int)OwnerStatus.Skip;
-                await _azureTableService.UpdateEntityByRowKey(curRotate);
+                _azureTableService.UpdateEntityByRowKey(curRotate);
                 firstRotate = teamDailyRotates.FirstOrDefault(rotate => rotate.Status == (int)OwnerStatus.Wait);
 
                 if (firstRotate == null)
@@ -119,39 +116,77 @@ public class CAFReminderService
         }
     }
 
-    public async Task SendReminder(ReminderCacheEntity reminderCache)
+    public async Task UpdateRotateAndSendReminder(ReminderCacheEntity reminderCache)
     {
         var reminderJobName = reminderCache.ReminderJobName.RowKey;
         var rotateTableName = reminderCache.RotateTableRef.Content;
         try
         {
-            var teamDailyMsgTemplateContent = _azureTableService
+            var emailTemplateContents = _azureTableService
                 .GetEntityByRowKey<MsgTemplateEntity>(TablePartitionKey.MsgTemplate, reminderJobName)
                 .Content;
 
-            if (teamDailyMsgTemplateContent.Contains("<next_username>"))
+            if (emailTemplateContents.Contains("<next_username>"))
             {
-                var username = GetNextRotator(rotateTableName).Result;
-                teamDailyMsgTemplateContent = teamDailyMsgTemplateContent.Replace("<next_username>", username.Content);
-            }
-            else if (teamDailyMsgTemplateContent.Contains("<cur_username>"))
-            {
-                var username = GetCurrentRotator(rotateTableName);
-                teamDailyMsgTemplateContent = teamDailyMsgTemplateContent.Replace("<cur_username>", username.Content);
+                var username = GetNextRotator(rotateTableName).Content;
+                emailTemplateContents = emailTemplateContents.Replace("<next_username>", username);
             }
 
-            if (teamDailyMsgTemplateContent.Contains("<all_username>"))
+            if (emailTemplateContents.Contains("<cur_username>"))
+            {
+                var username = GetCurrentRotator(rotateTableName).Content;
+                emailTemplateContents = emailTemplateContents.Replace("<cur_username>", username);
+            }
+
+            if (emailTemplateContents.Contains("<all_username>"))
             {
                 var allUsername = string.Join(", ",
                     GetAllRotatorsWithOrder(rotateTableName).Select(rotate => rotate.RowKey));
-                teamDailyMsgTemplateContent = teamDailyMsgTemplateContent.Replace("<all_username>", allUsername);
+                emailTemplateContents = emailTemplateContents.Replace("<all_username>", allUsername);
             }
 
             var webhook = _azureTableService
-                .GetEntityByRowKey<MsgTemplateEntity>(TablePartitionKey.HangsoutWebhooks, reminderJobName)
+                .GetEntityByRowKey<HangsoutWebhooks>(TablePartitionKey.HangsoutWebhooks, reminderJobName)
                 .Content;
 
-            await _hangoutService.SendMessage(webhook, teamDailyMsgTemplateContent);
+            await _hangoutService.SendMessage(webhook, emailTemplateContents);
+        }
+        catch (Exception e)
+        {
+            _log.LogError(e.Message);
+            throw;
+        }
+    }
+
+    public async Task SendReminderWithoutUpdate(ReminderCacheEntity reminderCache)
+    {
+        var reminderJobName = reminderCache.ReminderJobName.RowKey;
+        var rotateTableName = reminderCache.RotateTableRef.Content;
+        try
+        {
+            var emailTemplateContents = _azureTableService
+                .GetEntityByRowKey<MsgTemplateEntity>(TablePartitionKey.MsgTemplate, reminderJobName)
+                .Content;
+
+            if (emailTemplateContents.Contains("<next_username>") || emailTemplateContents.Contains("<cur_username>"))
+            {
+                var username = GetCurrentRotator(rotateTableName).Content;
+                emailTemplateContents = emailTemplateContents.Replace("<next_username>", username);
+                emailTemplateContents = emailTemplateContents.Replace("<cur_username>", username);
+            }
+
+            if (emailTemplateContents.Contains("<all_username>"))
+            {
+                var allUsername = string.Join(", ",
+                    GetAllRotatorsWithOrder(rotateTableName).Select(rotate => rotate.RowKey));
+                emailTemplateContents = emailTemplateContents.Replace("<all_username>", allUsername);
+            }
+
+            var webhook = _azureTableService
+                .GetEntityByRowKey<HangsoutWebhooks>(TablePartitionKey.HangsoutWebhooks, reminderJobName)
+                .Content;
+
+            await _hangoutService.SendMessage(webhook, emailTemplateContents);
         }
         catch (Exception e)
         {

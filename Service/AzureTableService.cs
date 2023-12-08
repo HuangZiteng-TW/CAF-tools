@@ -47,12 +47,11 @@ public class AzureTableService
         }
     }
 
-    public async Task UpdateEntityByRowKey(ITableEntity qEntity)
+    public void UpdateEntityByRowKey(ITableEntity qEntity)
     {
         try
         {
-            await _tableClient
-                .UpdateEntityAsync(qEntity, qEntity.ETag);
+            _tableClient.UpdateEntityAsync(qEntity, qEntity.ETag);
         }
         catch (Exception e)
         {
