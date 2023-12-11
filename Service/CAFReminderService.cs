@@ -57,31 +57,31 @@ public class CAFReminderService
     {
         var allRotatorsWithOrder = GetAllRotatorsWithOrder(rotateTableName);
 
-        var curRotate = allRotatorsWithOrder.FirstOrDefault(rotate => rotate.OwnerStatus == OwnerStatus.Cur);
+        var curRotate = allRotatorsWithOrder.FirstOrDefault(rotate => rotate.Status == OwnerStatus.Cur);
         if (curRotate != null)
         {
-            curRotate.OwnerStatus = OwnerStatus.Done;
+            curRotate.Status = OwnerStatus.Done;
             _azureTableService.UpdateEntityByRowKey(curRotate);
         }
 
         if (allRotatorsWithOrder.All(rotate =>
-                rotate.OwnerStatus == OwnerStatus.Done || rotate.OwnerStatus >= OwnerStatus.Skip))
+                rotate.Status == OwnerStatus.Done || rotate.Status >= OwnerStatus.Skip))
         {
             foreach (var rotate in allRotatorsWithOrder)
             {
-                rotate.OwnerStatus = OwnerStatus.Wait;
+                rotate.Status = OwnerStatus.Wait;
                 _azureTableService.UpdateEntityByRowKey(rotate);
             }
         }
 
-        var firstRotate = allRotatorsWithOrder.FirstOrDefault(rotate => rotate.OwnerStatus == OwnerStatus.Wait);
+        var firstRotate = allRotatorsWithOrder.FirstOrDefault(rotate => rotate.Status == OwnerStatus.Wait);
 
         if (firstRotate == null)
         {
             throw new RotateNotExistException();
         }
 
-        firstRotate.OwnerStatus = OwnerStatus.Cur;
+        firstRotate.Status = OwnerStatus.Cur;
         _azureTableService.UpdateEntityByRowKey(firstRotate);
 
         return firstRotate;

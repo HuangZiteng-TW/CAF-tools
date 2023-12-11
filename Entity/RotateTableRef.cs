@@ -7,8 +7,6 @@ namespace CAF.Entity;
 
 public class RotateTableRef : ITableEntity
 {
-    private OwnerStatus _status;
-
     public string PartitionKey { get; set; }
     public string RowKey { get; set; }
     public DateTimeOffset? Timestamp { get; set; }
