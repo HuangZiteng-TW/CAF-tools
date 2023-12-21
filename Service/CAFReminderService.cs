@@ -81,7 +81,6 @@ public class CAFReminderService
 
         foreach (var rotate in allRotatorsWithOrder)
         {
-            Console.WriteLine(rotate.RowKey + " - " + rotate.Status);
             _azureTableService.UpdateEntityByRowKey(rotate);
         }
 
