@@ -25,14 +25,13 @@ public class CAFReminderService
     private IEnumerable<Rotate> GetAllRotates(string rotateTableName)
     {
         var teamDailyRotates = _azureTableService.GetEntitysByPartitionKey<Rotate>(rotateTableName)
-            .Where(rotate => rotate.Status != (int)OwnerStatus.Inactive);
+            .Where(rotate => rotate.Status != OwnerStatus.Inactive);
 
         if (teamDailyRotates == null || !teamDailyRotates.Any())
         {
             throw new RotateListNotExistException();
         }
 
-        teamDailyRotates = teamDailyRotates.OrderBy(rotate => rotate.Order);
         return teamDailyRotates;
     }
 
@@ -61,16 +60,13 @@ public class CAFReminderService
         if (curRotate != null)
         {
             curRotate.Status = OwnerStatus.Done;
-            _azureTableService.UpdateEntityByRowKey(curRotate);
         }
 
-        if (allRotatorsWithOrder.All(rotate =>
-                rotate.Status == OwnerStatus.Done || rotate.Status >= OwnerStatus.Skip))
+        if (allRotatorsWithOrder.All(rotate => rotate.Status == OwnerStatus.Done || rotate.Status >= OwnerStatus.Skip))
         {
             foreach (var rotate in allRotatorsWithOrder)
             {
                 rotate.Status = OwnerStatus.Wait;
-                _azureTableService.UpdateEntityByRowKey(rotate);
             }
         }
 
@@ -82,7 +78,12 @@ public class CAFReminderService
         }
 
         firstRotate.Status = OwnerStatus.Cur;
-        _azureTableService.UpdateEntityByRowKey(firstRotate);
+
+        foreach (var rotate in allRotatorsWithOrder)
+        {
+            Console.WriteLine(rotate.RowKey + " - " + rotate.Status);
+            _azureTableService.UpdateEntityByRowKey(rotate);
+        }
 
         return firstRotate;
     }
