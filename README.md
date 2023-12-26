@@ -7,11 +7,11 @@ This tool is used to send meeting reminder message in Google Chat regularly.
 ### Preparation
 1. Have an `Azure subscription`.
 2. `VS Code` and VS Code Extensions `Azure Tools` installed.
-3. `Azure Cli` or `Azure Functions Core Tools` installed.
+3. `Azure Cli` and `Azure Functions Core Tools` installed.
 4. `Azure Storage Explorer` installed.
 
 ### Deploy Service
-1. Create a new `Azure Function App`(will create `Azure Storage Account` as well).
+1. Create a new `Azure Function App`(will create `Azure Storage Account` as well). Change the runtime to `.net`
 2. Create two Azure Tables in the Azure Storage Account. e.g. `CAFTable`(for Prod env) and `CAFTableLocal`(for Dev env)
 3. Change Function App configuration for Prod env, add
    1. `TableUri`: Azure Table url.
@@ -58,12 +58,12 @@ All fields shown in the picture are required.
 - For the job setting(First picture), all RowKeys are the same.
 - For the rotate list(Second picture), at least 1 rotator is required, and all PartitionKeys are the same.
 
-![img_1.png](img/img_1.png)
-![img_2.png](img/img_2.png)
+![img_1.png](./img/img_1.png)
+![img_2.png](./img/img_2.png)
 
 #### Manually
 ApiKey is required.
-![img_3.png](img/img_3.png)
+![img_3.png](./img/img_3.png)
 
 2 Apis are provided:
 
