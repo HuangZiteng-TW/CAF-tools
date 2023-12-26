@@ -13,7 +13,7 @@ This tool is used to send meeting reminder message in Google Chat regularly.
 ### Deploy Service
 1. Create a new `Azure Function App`(will create `Azure Storage Account` as well). Change the runtime to `.net`
 2. Create two Azure Tables in the Azure Storage Account. e.g. `CAFTable`(for Prod env) and `CAFTableLocal`(for Dev env)
-3. Change Function App configuration for Prod env, add
+3. Change Function App configuration for Prod env (Function App -> Settings-> Configuration -> New application setting), add
    1. `TableUri`: Azure Table url.
    2. `TableName`: Azure Table name.
    3. `TableAccountName`: Azure Storage Account name.
