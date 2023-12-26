@@ -15,25 +15,7 @@ public class LocalMemeCache
     private readonly ILogger<LocalMemeCache> _log;
 
     public List<ReminderCacheEntity> ReminderCaches { get; } = new();
-
-    private DayTypeDetail _todayDayTypeDetailCache;
-    private DateTime _todayIsHolidayLastUpdateTime;
-
-    public DayTypeDetail TodayDayTypeDetailCache
-    {
-        get
-        {
-            var currentDatetime = _dateService.GetCurrentDatetime();
-            if (_todayIsHolidayLastUpdateTime != currentDatetime.Date)
-            {
-                _todayDayTypeDetailCache = _dateService.GetTodayDayTypeV2().Result;
-                _todayIsHolidayLastUpdateTime = currentDatetime.Date;
-            }
-
-            return _todayDayTypeDetailCache;
-        }
-    }
-
+    
     public LocalMemeCache(AzureTableService azureTableService, DateService dateService, ILogger<LocalMemeCache> log)
     {
         _azureTableService = azureTableService;

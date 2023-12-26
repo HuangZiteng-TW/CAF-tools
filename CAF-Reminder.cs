@@ -23,11 +23,6 @@ namespace CAF.Reminder
         [FunctionName("CAF-Reminder")]
         public async Task Run([TimerTrigger("0 */1 * * * *")] TimerInfo myTimer, ILogger log)
         {
-            
-            if (_localMemeCache.TodayDayTypeDetailCache.isHoliday())
-            {
-                return;
-            }
 
             var currentDatetime = _dateService.GetCurrentDatetime();
             log.LogInformation("log information: " + currentDatetime);
