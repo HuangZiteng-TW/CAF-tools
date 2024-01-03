@@ -37,10 +37,11 @@ public class LocalMemeCache
                 .GetEntityByRowKey<RotateTableRef>(TablePartitionKey.RotateTableRef, reminderJobName.RowKey);
             var reminderCache = ReminderCaches
                 .SingleOrDefault(reminderCache => reminderCache.ReminderJobName.RowKey == reminderJobName.RowKey, null);
-            _log.LogInformation("reminderJobNames : " + reminderJobName);
+            _log.LogInformation("reminderJobNames : " + reminderJobName.RowKey);
             if (reminderCache == null)
             {
                 reminderCache = new ReminderCacheEntity();
+                
                 ReminderCaches.Add(reminderCache);
             }
 

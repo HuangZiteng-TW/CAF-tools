@@ -154,6 +154,7 @@ public class CAFReminderService
         catch (Exception e)
         {
             _log.LogError(e.Message);
+            _log.LogError(e.StackTrace);
             throw;
         }
     }
