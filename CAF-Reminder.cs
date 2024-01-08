@@ -30,10 +30,13 @@ namespace CAF.Reminder
 
             foreach (var reminderCache in _localMemeCache.ReminderCaches)
             {
-                log.LogInformation(reminderCache.Schedule.ScheduleCron.ToString());
-                Console.WriteLine(reminderCache.Schedule.ScheduleCron.ToString());
+                var reminderJobName = reminderCache.ReminderJobName.RowKey;
+                log.LogInformation(reminderJobName + " - " + reminderCache.Schedule.ScheduleCron.ToString());
+                Console.WriteLine(reminderJobName + " - " + reminderCache.Schedule.ScheduleCron.ToString());
                 if (reminderCache.Schedule.ScheduleCron.Match(currentDatetime))
                 {
+                    log.LogInformation(reminderJobName + " - " + "Schedule check passed and sending the reminder");
+                    Console.WriteLine(reminderJobName + " - " + "Schedule check passed and sending the reminder");
                     await _cafReminderService.UpdateRotateAndSendReminder(reminderCache);
                 }
             }
