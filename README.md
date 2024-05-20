@@ -24,7 +24,7 @@ This tool is used to send meeting reminder message in Google Chat regularly.
    2. `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING`: Connection String (Copy from Storage account: Security + networking -> Access Keys -> Key1 Connection string)
    3. `WEBSITE_CONTENTSHARE`: Name of Azure Storage Account File Share (Create a new File Share under the Storage Account and copy the name and paste here)
 
-4. Import dev data(in the `data_bak.zip` file) into Azure Table, change the data(HangsoutWebhook, User ID) by using `Azure Storage Explorer` before test this project.
+4. Import dev data(in the `data_bak/Table_backup` folder) into Azure Table, change the data(HangsoutWebhook, User ID) by using `Azure Storage Explorer` before test this project.
 5. Open local codebase by using VS Code and add a new file `local.settings.json` in the root folder, contents shown below, need change all the 4 fields listed in **Step3**.
     ```json
     {

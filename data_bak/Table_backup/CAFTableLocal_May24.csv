@@ -1,0 +1,49 @@
+PartitionKey,RowKey,Content,Content@type,Order,Order@type,Status,Status@type
+ApiKey,Ziteng,4cfdcd4680937d2705587f4cd3470591ce50e7fd18cbf5c4d95f7c58aea534de,String,,,,
+HangsoutWebhooks,L3Daily,https://chat.googleapis.com/v1/spaces/AAAAezHEwpk/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=jLlz19Q1rFNtaTFwn6FP8YwT_72PqFbpm-OH1Y_DkZA,String,,,,
+HangsoutWebhooks,TeamDaily,https://chat.googleapis.com/v1/spaces/AAAAezHEwpk/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=jLlz19Q1rFNtaTFwn6FP8YwT_72PqFbpm-OH1Y_DkZA,String,,,,
+MsgTemplate,L3Daily,"------------ ● L3 Daily Reminder ● ------------ 
+Current Owner: <cur_username>
+Rotate List: <all_username>
+Hotfix Dependency Link：https://docs.google.com/drawings/d/1F7vYL6hkuBGxAVW8UdYNQbxASMCPM48-Kx3rHEFe5E8/edit
+Board Link：https://dev.azure.com/vialto/myMobility-CoreApp/_boards/board/t/DAMO%20Support/Stories
+Vialto Daily Update Link：https://docs.google.com/spreadsheets/d/1JEiNOYJ7wYHholStmagu7TaJyKtSIv5B6TkDQF1wwxY/edit#gid=447566571
+Zoom Link：https://thoughtworks.zoom.us/j/96145737170",String,,,,
+MsgTemplate,TeamDaily,"------------ ● Team Daily Reminder ● ------------ 
+Current Owner: <next_username>
+Rotate List: <all_username>
+Board Link：https://dev.azure.com/vialto/myMobility-CoreApp/_boards/board/t/DAMO%20Support/Stories
+Zoom Link：https://thoughtworks.zoom.us/j/98406864886",String,,,,
+ReminderJobName,L3Daily,,,,,,
+ReminderJobName,TeamDaily,,,,,,
+Rotate-L3Daily,Guangyi,<users/114735937571674989041>,String,2,Int32,1,Int32
+Rotate-L3Daily,Liu Jing,<users/114735937571674989041>,String,1,Int32,1,Int32
+Rotate-L3Daily,Sreeraj,<users/114735937571674989041>,String,4,Int32,1,Int32
+Rotate-L3Daily,Xiaoxiao,<users/114735937571674989041>,String,3,Int32,1,Int32
+Rotate-L3Daily,Yuxuan,<users/114735937571674989041>,String,5,Int32,2,Int32
+Rotate-TeamDaily,Guangyi,<users/114735937571674989041>,String,4,Int32,1,Int32
+Rotate-TeamDaily,Li Xin,<users/114735937571674989041>,String,6,Int32,1,Int32
+Rotate-TeamDaily,Liu Jing,<users/114735937571674989041>,String,2,Int32,2,Int32
+Rotate-TeamDaily,Wang Qing,<users/114735937571674989041>,String,1,Int32,3,Int32
+Rotate-TeamDaily,Xiaoxiao,<users/114735937571674989041>,String,5,Int32,1,Int32
+Rotate-TeamDaily,Yujun,<users/114735937571674989041>,String,8,Int32,1,Int32
+Rotate-TeamDaily,Yuxuan,<users/114735937571674989041>,String,7,Int32,1,Int32
+Rotate-TeamDaily,Ziteng,<users/114735937571674989041>,String,3,Int32,1,Int32
+RotateTableRef,L3Daily,Rotate-L3Daily,String,,,,
+RotateTableRef,TeamDaily,Rotate-TeamDaily,String,,,,
+Schedule,L3Daily,"{
+    ""Year"": [""*""],
+    ""Month"": [""*""],
+    ""Weekday"":[""1"",""2"",""3"",""4""],
+    ""Day"": [""*""],
+    ""Hour"": [""18""],
+    ""Minute"": [""25""]
+}",String,,,,
+Schedule,TeamDaily,"{
+    ""Year"": [""*""],
+    ""Month"": [""*""],
+    ""Weekday"":[""1"",""2"",""3"",""4"",""5""],
+    ""Day"": [""*""],
+    ""Hour"": [""10""],
+    ""Minute"": [""51""]
+}",String,,,,

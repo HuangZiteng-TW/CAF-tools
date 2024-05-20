@@ -1,0 +1,73 @@
+PartitionKey,RowKey,Content,Content@type,Order,Order@type,Status,Status@type
+ApiKey,Ziteng,4cfdcd4680937d2705587f4cd3470591ce50e7fd18cbf5c4d95f7c58aea534de,String,,,,
+HangsoutWebhooks,CodeReview,https://chat.googleapis.com/v1/spaces/AAAAsJ-DSgo/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=0hX3TpjNcuHsICGY0HDQNr0H8uy4dARtmvIRiK9iqZ4,String,,,,
+HangsoutWebhooks,L3Daily,https://chat.googleapis.com/v1/spaces/AAAAsJ-DSgo/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=0hX3TpjNcuHsICGY0HDQNr0H8uy4dARtmvIRiK9iqZ4,String,,,,
+HangsoutWebhooks,TeamDaily,https://chat.googleapis.com/v1/spaces/AAAAsJ-DSgo/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=0hX3TpjNcuHsICGY0HDQNr0H8uy4dARtmvIRiK9iqZ4,String,,,,
+HangsoutWebhooks,WeeklyReport,https://chat.googleapis.com/v1/spaces/AAAAsJ-DSgo/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=0hX3TpjNcuHsICGY0HDQNr0H8uy4dARtmvIRiK9iqZ4,String,,,,
+MsgTemplate,CodeReview,"------------ ● CodeReview Reminder ● ------------ 
+Current Owner: <next_username>
+Rotate List: <all_username>
+Board Link：https://dev.azure.com/vialto/myMobility-CoreApp/_boards/board/t/DAMO%20Support/Stories
+Zoom Link：https://thoughtworks.zoom.us/j/99787293879",String,,,,
+MsgTemplate,L3Daily,"------------ ● L3 Daily Reminder ● ------------ 
+Current Owner: <cur_username>
+Rotate List: <all_username>
+Hotfix Dependency Link：https://docs.google.com/drawings/d/1F7vYL6hkuBGxAVW8UdYNQbxASMCPM48-Kx3rHEFe5E8/edit
+Board Link：https://dev.azure.com/vialto/myMobility-CoreApp/_boards/board/t/DAMO%20Support/Stories
+Vialto Daily Update Link：https://docs.google.com/spreadsheets/d/1JEiNOYJ7wYHholStmagu7TaJyKtSIv5B6TkDQF1wwxY/edit#gid=447566571
+Zoom Link：https://thoughtworks.zoom.us/j/96145737170",String,,,,
+MsgTemplate,TeamDaily,"------------ ● Team Daily Reminder ● ------------ 
+Current Owner: <next_username>
+Rotate List: <all_username>
+Board Link：https://dev.azure.com/vialto/myMobility-CoreApp/_boards/board/t/DAMO%20Support/Stories
+Zoom Link：https://thoughtworks.zoom.us/j/98406864886",String,,,,
+MsgTemplate,WeeklyReport,------------ ● Weekly Report Reminder ● ------------ Current Owner: <cur_username>,String,,,,
+ReminderJobName,CodeReview,,,,,,
+ReminderJobName,TeamDaily,,,,,,
+ReminderJobName_OLD,L3Daily,,,,,,
+Rotate-L3Daily,Aman,<users/106787844676222719548>,String,6,Int32,1,Int32
+Rotate-L3Daily,Amrutha,<users/112561160117130231032>,String,3,Int32,3,Int32
+Rotate-L3Daily,Haritha,<users/110961802381085470991>,String,4,Int32,3,Int32
+Rotate-L3Daily,Ravindra,<users/118227490320173834894>,String,5,Int32,2,Int32
+Rotate-L3Daily,Sreeraj,<users/109360317013064430249>,String,2,Int32,3,Int32
+Rotate-L3Daily,Tian Zhen,<users/112537854471967529733>,String,2,Int32,3,Int32
+Rotate-TeamDaily,Aman,<users/106787844676222719548>,String,7,Int32,3,Int32
+Rotate-TeamDaily,Amrutha,<users/113902491944441031294>,String,4,Int32,3,Int32
+Rotate-TeamDaily,Guangyi,<users/117355712960998495033>,String,1,Int32,3,Int32
+Rotate-TeamDaily,Haritha,<users/110961802381085470991>,String,3,Int32,3,Int32
+Rotate-TeamDaily,Hemalatha,<users/115476434057650136649>,String,8,Int32,3,Int32
+Rotate-TeamDaily,Ravindra,<users/118227490320173834894>,String,6,Int32,3,Int32
+Rotate-TeamDaily,Sandeep,<users/107926776712034793978>,String,9,Int32,2,Int32
+Rotate-TeamDaily,Santhakumar,<users/104425670776657634270>,String,10,Int32,1,Int32
+Rotate-TeamDaily,Sreeraj,<users/109360317013064430249>,String,5,Int32,3,Int32
+Rotate-TeamDaily,Tian Zhen,<users/112537854471967529733>,String,2,Int32,3,Int32
+RotateTableRef,CodeReview,Rotate-L3Daily,String,,,,
+RotateTableRef,L3Daily,Rotate-L3Daily,String,,,,
+RotateTableRef,TeamDaily,Rotate-TeamDaily,String,,,,
+RotateTableRef,WeeklyReport,Rotate-L3Daily,String,,,,
+Schedule,CodeReview,"{
+    ""Year"": [""*""],
+    ""Month"": [""*""],
+    ""Weekday"":[""1"",""2"",""3"",""4"",""5""],
+    ""Day"": [""*""],
+    ""Hour"": [""16""],
+    ""Minute"": [""55""]
+}",String,,,,
+Schedule,L3Daily,"{
+    ""Year"": [""*""],
+    ""Month"": [""*""],
+    ""Weekday"":[""2"",""3"",""4"",""5""],
+    ""Day"": [""*""],
+    ""Hour"": [""8""],
+    ""Minute"": [""50""]
+}",String,,,,
+Schedule,TeamDaily,"{    ""Year"": [""*""],    ""Month"": [""*""],    ""Weekday"":[""1"",""2"",""3"",""4"",""5""],    ""Day"": [""*""],    ""Hour"": [""13""],    ""Minute"": [""50""]}",String,,,,
+Schedule,WeeklyReport,"{
+    ""Year"": [""*""],
+    ""Month"": [""*""],
+    ""Weekday"":[""1""],
+    ""Day"": [""*""],
+    ""Hour"": [""9""],
+    ""Minute"": [""26""]
+}",String,,,,
+■■■■■PROD■■■■■,■■■■■PROD■■■■■,■■■■■PROD■■■■■,String,,,,
